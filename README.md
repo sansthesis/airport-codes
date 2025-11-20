@@ -77,8 +77,6 @@ Adding a `json` file to `/data` will automatically render it. You do not need to
   - medium - 900px width
   - large - 1500px width
 
-- Add variable to `/assets/globals/image-names.styl`. The code must match the airport code. So if an image is named `abq.jpg` you would add `'abq': '',` to the `image-names.styl`.
-
 ## Editing Templates
 
 Most site content is written in Pug templates which produce the site HTML.
