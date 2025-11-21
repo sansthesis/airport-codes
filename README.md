@@ -67,15 +67,11 @@ Adding a `json` file to `/data` will automatically render it. You do not need to
 - Please use photos from Flickr that are licensed under Creative Commons.
 - If photos are not available on Flickr, please use Wikipedia with the same license.
 - Images should be named with this convention: `code.jpg`
-- To generate images (large, medium, small, and card):
-  - Save out the image as a JPG at large size (1500px wide) with the filename `assets/images/large/code.jpg`
+- To generate images (medium and card):
+  - Save out the image as a JPG at medium size (900px wide) with the filename `assets/images/medium/code.jpg`
   - **Please optimize images** ([tinyjpg.com](https://tinyjpg.com/) is a good tool to do that)
   - Run `npm run build`
-- If you’d like to save out the image sizes manually, these are the sizes needed:
-  - card - 220px *height*
-  - small - 500px width
-  - medium - 900px width
-  - large - 1500px width
+- This will save out a card size image: `assets/images/card/code.avif`
 
 ## Editing Templates
 
