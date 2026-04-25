@@ -47,6 +47,7 @@ export function renderHomePage() {
         renderPug(path.join(VIEWS_DIR, "index.pug"), {
           airportData,
           inlineCss,
+          inlineJs: renderJsFile("search.js"),
         }),
       );
     });
@@ -82,8 +83,16 @@ export function renderStylusFile(filename) {
 }
 
 export function renderJsFile(filename) {
-  let data = fs.readFileSync(path.join(JS_DIR, filename), "utf8");
+  const data = fs.readFileSync(path.join(JS_DIR, filename), "utf8");
+  const output = minify_sync(data, {
+    compress: true,
+    ecma: 2020,
+    mangle: true,
+  });
+  return output.code;
+}
 
+export function getSearchData() {
   const keys = [
     "id",
     "name",
@@ -94,20 +103,18 @@ export function renderJsFile(filename) {
     "stateShort",
     "country",
   ];
-
-  const searchData = Object.values(airportData).map((it) => {
-    return keys.map((key) => (it[key] || "").toLowerCase()).filter(Boolean);
+  return Object.values(airportData).map((it) => {
+    const seen = new Set();
+    const words = [];
+    for (const key of keys) {
+      const value = (it[key] || "").toLowerCase();
+      for (const word of value.split(/\s+/)) {
+        if (word && !seen.has(word)) {
+          seen.add(word);
+          words.push(word);
+        }
+      }
+    }
+    return words.join(" ");
   });
-
-  data = data.replaceAll(
-    "process.env.VAR_SEARCH_DATA",
-    JSON.stringify(searchData),
-  );
-
-  const output = minify_sync(data, {
-    compress: true,
-    ecma: 2020,
-    mangle: true,
-  });
-  return output.code;
 }
