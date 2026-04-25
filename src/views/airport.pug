@@ -15,19 +15,8 @@ html(lang="en")
         link(rel="preload", href="https://use.typekit.net/sei6hkn.css", as="style", onload="this.onload=null;this.rel='stylesheet';")
         link(rel="stylesheet", href="/airport.css")
         script(data-goatcounter='https://airportcodes.goatcounter.com/count' async src='https://gc.zgo.at/count.js')
+        script(src="/airport-codes.js?v=" + data.codesHash, defer)
         title Airport Codes
-        script.
-            const airportCodes = !{JSON.stringify(data.allAirportCodes)};
-            document.addEventListener(
-                'DOMContentLoaded',
-                function onReady() {
-                    document.querySelector('.random').addEventListener('click', function onClick(event) {
-                        event.preventDefault();
-                        const airport = airportCodes[Math.floor(Math.random() * airportCodes.length)];
-                        window.location.href = `/airport/${airport}/`;
-                    });
-                }
-            );
     body 
         .detail
             img.detail-bg(src="/images/medium/" + data.id + ".jpg")

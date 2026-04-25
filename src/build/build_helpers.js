@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import pug from "pug";
@@ -43,11 +44,15 @@ export function renderHomePage() {
   return new Promise((resolve, reject) => {
     const inlineCssPromise = renderStylusFile("home.styl");
     inlineCssPromise.then((inlineCss) => {
+      const inlineJs = renderJsFile("search.js").replace(
+        "/search-data.txt",
+        `/search-data.txt?v=${getSearchDataHash()}`,
+      );
       resolve(
         renderPug(path.join(VIEWS_DIR, "index.pug"), {
           airportData,
           inlineCss,
-          inlineJs: renderJsFile("search.js"),
+          inlineJs,
         }),
       );
     });
@@ -57,7 +62,7 @@ export function renderHomePage() {
 export function renderAirportPage(code) {
   return renderPug(path.join(VIEWS_DIR, "airport.pug"), {
     ...airportData[code],
-    allAirportCodes: Object.keys(airportData),
+    codesHash: getAirportCodesHash(),
   });
 }
 
@@ -90,6 +95,43 @@ export function renderJsFile(filename) {
     mangle: true,
   });
   return output.code;
+}
+
+function shortHash(content) {
+  return crypto.createHash("sha256").update(content).digest("hex").slice(0, 8);
+}
+
+export function getSearchDataHash() {
+  return shortHash(getSearchData().join("\n"));
+}
+
+export function getAirportCodesJs() {
+  const codeList = Object.keys(airportData);
+  if (codeList.some((c) => c.length !== 3)) {
+    throw new Error("All airport codes must be 3 characters for packed encoding");
+  }
+  const codes = codeList.join("");
+  const source = `
+(function () {
+  const codes = ${JSON.stringify(codes)};
+  const btn = document.querySelector('.random');
+  if (!btn) return;
+  btn.addEventListener('click', function (e) {
+    e.preventDefault();
+    const i = Math.floor(Math.random() * (codes.length / 3)) * 3;
+    window.location.href = '/airport/' + codes.slice(i, i + 3) + '/';
+  });
+})();
+`;
+  return minify_sync(source, {
+    compress: true,
+    ecma: 2020,
+    mangle: true,
+  }).code;
+}
+
+export function getAirportCodesHash() {
+  return shortHash(getAirportCodesJs());
 }
 
 export function getSearchData() {

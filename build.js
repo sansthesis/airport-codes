@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import readAllDataJson from "./src/build/read_all_data.js";
 import {
+  getAirportCodesJs,
   getSearchData,
   render404Page,
   renderAboutPage,
@@ -80,5 +81,11 @@ generateJsFiles(
 fs.writeFileSync(
   path.join(OUTPUT_DIR, "search-data.txt"),
   getSearchData().join("\n"),
+  { encoding: "utf-8" },
+);
+
+fs.writeFileSync(
+  path.join(OUTPUT_DIR, "airport-codes.js"),
+  getAirportCodesJs(),
   { encoding: "utf-8" },
 );
