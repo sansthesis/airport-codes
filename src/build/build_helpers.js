@@ -18,11 +18,15 @@ function renderPug(inputFile, extraData = {}) {
 }
 
 export function render404Page() {
-  return renderPug(path.join(VIEWS_DIR, "404.pug"));
+  return renderPug(path.join(VIEWS_DIR, "404.pug"), {
+    aboutCssHash: getAboutCssHash(),
+  });
 }
 
 export function renderContributePage() {
-  return renderPug(path.join(VIEWS_DIR, "contribute.pug"));
+  return renderPug(path.join(VIEWS_DIR, "contribute.pug"), {
+    aboutCssHash: getAboutCssHash(),
+  });
 }
 
 export function renderAboutPage() {
@@ -37,6 +41,7 @@ export function renderAboutPage() {
     airportCount,
     countryCount,
     photographerCount,
+    aboutCssHash: getAboutCssHash(),
   });
 }
 
@@ -63,6 +68,8 @@ export function renderAirportPage(code) {
   return renderPug(path.join(VIEWS_DIR, "airport.pug"), {
     ...airportData[code],
     codesHash: getAirportCodesHash(),
+    airportCssHash: getAirportCssHash(),
+    mediumImageHash: getMediumImageHash(code),
   });
 }
 
@@ -159,4 +166,30 @@ export function getSearchData() {
     }
     return words.join(" ");
   });
+}
+
+const AIRPORT_CSS_HASH = shortHash(await renderStylusFile("airport.styl"));
+const ABOUT_CSS_HASH = shortHash(await renderStylusFile("about.styl"));
+
+export function getAirportCssHash() {
+  return AIRPORT_CSS_HASH;
+}
+
+export function getAboutCssHash() {
+  return ABOUT_CSS_HASH;
+}
+
+const MEDIUM_DIR = path.join(ASSETS_DIR, "images", "medium");
+const MEDIUM_IMAGE_HASHES = Object.fromEntries(
+  fs
+    .readdirSync(MEDIUM_DIR)
+    .filter((f) => f.endsWith(".jpg"))
+    .map((f) => [
+      f.slice(0, -4),
+      shortHash(fs.readFileSync(path.join(MEDIUM_DIR, f))),
+    ]),
+);
+
+export function getMediumImageHash(code) {
+  return MEDIUM_IMAGE_HASHES[code];
 }
